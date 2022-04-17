@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# Mousetrap
+#
+
+program="$(realpath "$0")"
+directory="$(dirname "$program")"
+
+source "$directory/lib/Mousetrap.sh"
+
+trap '$(Mousetrap.cleanup); exit' SIGHUP SIGINT SIGTERM
+
+command=${1-}
+mouse="${2-$(Mousetrap.current)}"
+
+case $command in
+  # reset the mouse coordinates when the window recieves focus
+  reset)
+    Mousetrap.set "$(Mousetrap.activity)" "$(Mousetrap.caught)" "$(Mousetrap.set_at)"
+  ;;
+
+  # bind a reset for whenever the window recieves focus
+  watch)
+    ! Mousetrap.active && Mousetrap.watch "$mouse"
+  ;;
+
+  info)
+
+    if ! Mousetrap.active; then
+      echo "Mousetrap not active"
+      exit 1
+    fi
+
+    echo "Tracking: $mouse"
+    echo "Process: $(Mousetrap.watcher)"
+    echo "Info: $(Mousetrap.info)"
+  ;;
+
+  # turn the trap on or off
+  toggle)
+    if Mousetrap.active; then
+      Mousetrap.unset "$program";
+    else
+      if [ -z "$mouse" ]; then
+        echo "Please provide a class name of a window to watch"
+        exit 1
+      fi
+
+      Mousetrap.setup
+
+      $program watch "$mouse" &
+    fi
+  ;;
+
+  check)
+    ! Mousetrap.active && exit 1
+
+    Mousetrap.check
+  ;;
+
+  # determine if mouse movement has occurred
+  *)
+    ! Mousetrap.active && exit 1
+
+    Mousetrap.check
+  ;;
+esac

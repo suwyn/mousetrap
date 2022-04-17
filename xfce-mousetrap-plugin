@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# xfce-mousetrap-plugin
+#
+# control mousetrap from a custom xfce panel
+
+script="$(realpath "$0")"
+directory="$(dirname "$script")"
+program="$directory/mousetrap"
+
+source "$directory/lib/Mousetrap.sh"
+
+echo "<img>$directory/icons/mouse-24.png</img>"
+
+if Mousetrap.active; then
+  score="$($program)"
+
+  if [ "$score" -gt 75 ]; then
+    color=green
+  elif [ "$score" -gt 45 ]; then
+    color=yellow
+  else
+    color=red
+  fi
+
+  current=$(Mousetrap.current)
+  echo "<click>$program toggle $current</click>"
+  echo "<txt>$current: <span fgcolor='$color'>$score</span></txt>"
+else
+  active_window=$(Window.name)
+  echo "<click>$program toggle $active_window</click>"
+  echo "<txt>$active_window: xx</txt>"
+  exit
+fi
+
