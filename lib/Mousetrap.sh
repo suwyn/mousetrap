@@ -53,12 +53,12 @@ function Mouse.moved {
 }
 
 function Mousetrap.set {
-  local ticks=$1
-  local count=$2
+  local activity=$1
+  local caught=$2
   local set_at=$3
   local info
 
-  info="$ticks $count $set_at $(Mouse.at)"
+  info="$activity $caught $set_at $(Mouse.at)"
 
   echo "$info" > "$(Mousetrap.file)"
 }
@@ -117,15 +117,15 @@ function Mousetrap.watch {
 
 # checks the mouse trap and returns a score
 function Mousetrap.check {
-  local ticks count idle=true
+  local activity caught idle=true
 
   # memoize the info to reduce file reads
   MOUSETRAP_INFO=$(Mousetrap.info)
 
-  ticks=$(Mousetrap.activity)
+  activity=$(Mousetrap.activity)
   if Mousetrap.hasActivity; then
     idle=false
-    ticks=$((ticks + 1))
+    activity=$((activity + 1))
   fi
 
   caught=$(Mousetrap.caught)
@@ -135,10 +135,10 @@ function Mousetrap.check {
   fi
 
   if ! $idle; then
-    Mousetrap.set "$ticks" "$caught" "$(Mousetrap.set_at)"
+    Mousetrap.set "$activity" "$caught" "$(Mousetrap.set_at)"
   fi
 
-  echo "scale=2; (1 - $caught/$ticks) * 100" | bc | xargs printf "%.0f"
+  echo "scale=2; (1 - $caught/$activity) * 100" | bc | xargs printf "%.0f"
 }
 
 function Mousetrap.log {
