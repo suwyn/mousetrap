@@ -25,7 +25,6 @@ case $command in
   ;;
 
   info)
-
     if ! Mousetrap.active; then
       echo "Mousetrap not active"
       exit 1

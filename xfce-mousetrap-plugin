@@ -32,4 +32,3 @@ else
   echo "<txt>$active_window: xx</txt>"
   exit
 fi
-
